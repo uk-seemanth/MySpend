@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* light: bg #F5F0E1, card #FBF8EF, olive #6B7A3A, dark olive #3F4A1F, text #2B2B1F */
+  :root {
+    --bg: 245 240 225;
+    --card: 251 248 239;
+    --ink: 43 43 31;
+    --line: 226 219 196;
+    --olive: 107 122 58;
+    --olive-dark: 63 74 31;
+    --on-olive: 251 248 239;
+    --shadow: 63 74 31;
+    color-scheme: light;
+  }
+
+  /* dark: bg #1C2014, card #262B1B, olive #A3B565, text #EDE8D6 */
+  .dark {
+    --bg: 28 32 20;
+    --card: 38 43 27;
+    --ink: 237 232 214;
+    --line: 58 65 42;
+    --olive: 163 181 101;
+    --olive-dark: 197 209 150;
+    --on-olive: 28 32 20;
+    --shadow: 0 0 0;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+  }
+
+  /* visible keyboard focus everywhere */
+  :focus-visible {
+    @apply outline-none ring-2 ring-olive ring-offset-2 ring-offset-bg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line/60 bg-card p-5 shadow-soft;
+  }
+  .skeleton {
+    @apply animate-pulse rounded-xl bg-ink/10;
+  }
+}
