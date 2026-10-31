@@ -26,7 +26,7 @@ export default function Register() {
         await fetchProfile();
         navigate("/dashboard", { replace: true });
       } else {
-        toast.success("Check your email to confirm your account, then log in.");
+        toast.success("Check your email to confirm your account. Confirm your email, then log in.");
         navigate("/login", { replace: true });
       }
     } catch (e) {

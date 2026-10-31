@@ -15,7 +15,24 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
-    if (error.response?.status === 401) await supabase.auth.signOut();
+    const originalRequest = error.config;
+
+    // On 401, try refreshing the token once before signing out
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const { error: refreshError } = await supabase.auth.refreshSession();
+      if (!refreshError) {
+        // attach the fresh token and retry
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          originalRequest.headers.Authorization = `Bearer ${data.session.access_token}`;
+        }
+        return api(originalRequest);
+      }
+      // refresh failed → sign out
+      await supabase.auth.signOut();
+    }
+
     // surface server message so toasts show something useful
     error.message = error.response?.data?.error || error.message;
     return Promise.reject(error);

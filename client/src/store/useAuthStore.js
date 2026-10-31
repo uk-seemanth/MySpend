@@ -13,10 +13,15 @@ export const useAuthStore = create((set, get) => ({
     if (data.session) await get().fetchProfile();
     set({ loading: false });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       // only set state here; no awaited supabase calls inside this callback
-      set({ user: session?.user ?? null });
-      if (!session) set({ profile: null });
+      if (event === "TOKEN_REFRESHED") {
+        // update user but keep existing profile intact
+        set({ user: session?.user ?? null });
+      } else {
+        set({ user: session?.user ?? null });
+        if (!session) set({ profile: null });
+      }
     });
     return () => sub.subscription.unsubscribe();
   },
@@ -38,8 +43,22 @@ export const useAuthStore = create((set, get) => ({
 
   signIn: async ({ email, password }) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      if (error.message?.includes("Email not confirmed")) {
+        const err = new Error(
+          "Please confirm your email first. Check your inbox and spam folder."
+        );
+        err.code = "EMAIL_NOT_CONFIRMED";
+        throw err;
+      }
+      throw error;
+    }
     await get().fetchProfile();
+  },
+
+  resendConfirmation: async (email) => {
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    if (error) throw error;
   },
 
   signOut: async () => {
