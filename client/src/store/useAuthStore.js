@@ -15,9 +15,16 @@ export const useAuthStore = create((set, get) => ({
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       // only set state here; no awaited supabase calls inside this callback
-      if (event === "TOKEN_REFRESHED") {
+      if (event === "SIGNED_IN") {
+        set({ user: session?.user ?? null });
+        if (!get().profile && session?.user) {
+          get().fetchProfile(); // un-awaited async call
+        }
+      } else if (event === "TOKEN_REFRESHED") {
         // update user but keep existing profile intact
         set({ user: session?.user ?? null });
+      } else if (event === "SIGNED_OUT") {
+        set({ user: null, profile: null });
       } else {
         set({ user: session?.user ?? null });
         if (!session) set({ profile: null });

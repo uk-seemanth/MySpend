@@ -7,8 +7,8 @@ import { compact, formatBucket, tooltipStyle, EXPENSE_COLOR } from "./shared";
 export default function TrendLine({ data = [], height = 260 }) {
   const currency = useAuthStore((s) => s.profile?.currency ?? "USD");
   return (
-    <div className="text-ink" style={{ height }} role="img" aria-label="Cumulative spending trend">
-      <ResponsiveContainer>
+    <div className="w-full text-ink" style={{ height }} role="img" aria-label="Cumulative spending trend">
+      <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 4, left: -12, bottom: 0 }}>
           <defs>
             <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">

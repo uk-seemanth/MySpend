@@ -26,16 +26,24 @@ export default function TransactionItem({ item, onEdit, onDelete }) {
         </p>
       </div>
 
-      <p className={`shrink-0 text-sm font-bold ${income ? "text-health-safe" : ""}`}>
+      <p className={`shrink-0 text-right text-sm font-bold tabular-nums ${income ? "text-health-safe" : ""}`}>
         {income ? "+" : "−"}
         {formatMoney(item.amount, currency)}
       </p>
 
       <div className="flex shrink-0">
-        <button onClick={() => onEdit(item)} aria-label={`Edit ${item.title}`} className="rounded-lg p-2 text-ink/50 hover:bg-ink/10 hover:text-ink">
+        <button
+          onClick={() => onEdit(item)}
+          aria-label={`Edit ${item.title}`}
+          className="rounded-lg p-2 text-ink/50 transition hover:bg-ink/10 hover:text-ink focus-visible:ring-2 focus-visible:ring-olive"
+        >
           <Pencil className="h-4 w-4" />
         </button>
-        <button onClick={() => onDelete(item)} aria-label={`Delete ${item.title}`} className="rounded-lg p-2 text-ink/50 hover:bg-health-danger/15 hover:text-health-danger">
+        <button
+          onClick={() => onDelete(item)}
+          aria-label={`Delete ${item.title}`}
+          className="rounded-lg p-2 text-ink/50 transition hover:bg-health-danger/15 hover:text-health-danger focus-visible:ring-2 focus-visible:ring-health-danger"
+        >
           <Trash2 className="h-4 w-4" />
         </button>
       </div>

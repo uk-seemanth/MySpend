@@ -6,8 +6,8 @@ import { compact, formatBucket, tooltipStyle, INCOME_COLOR, EXPENSE_COLOR } from
 export default function SpendBarChart({ data = [], height = 280 }) {
   const currency = useAuthStore((s) => s.profile?.currency ?? "USD");
   return (
-    <div className="text-ink" style={{ height }} role="img" aria-label="Income and expenses over time">
-      <ResponsiveContainer>
+    <div className="w-full text-ink" style={{ height }} role="img" aria-label="Income and expenses over time">
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 4, left: -12, bottom: 0 }}>
           <CartesianGrid vertical={false} stroke="currentColor" strokeOpacity={0.1} />
           <XAxis dataKey="label" tickFormatter={formatBucket} tick={{ fill: "currentColor", fontSize: 12, opacity: 0.6 }} tickLine={false} axisLine={false} />

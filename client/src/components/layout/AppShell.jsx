@@ -17,7 +17,7 @@ export default function AppShell() {
   }, [fetchCategories]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <Sidebar />
 
       {/* mobile top bar */}
@@ -31,7 +31,7 @@ export default function AppShell() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 pb-28 pt-5 lg:ml-64 lg:px-8 lg:pb-10 lg:pt-8">
+      <main className="mx-auto max-w-5xl px-4 pb-36 pt-5 lg:ml-64 lg:px-8 lg:pb-12 lg:pt-8">
         <PageTransition key={location.pathname}>
           <Outlet />
         </PageTransition>

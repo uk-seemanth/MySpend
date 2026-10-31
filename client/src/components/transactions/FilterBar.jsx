@@ -61,8 +61,8 @@ export default function FilterBar() {
         </Input>
         <Input type="date" aria-label="From date" value={filters.from} onChange={(e) => setFilters({ from: e.target.value })} />
         <Input type="date" aria-label="To date" value={filters.to} onChange={(e) => setFilters({ to: e.target.value })} />
-        <Input type="number" aria-label="Minimum amount" placeholder="Min amount" value={min} onChange={(e) => setMin(e.target.value)} />
-        <Input type="number" aria-label="Maximum amount" placeholder="Max amount" value={max} onChange={(e) => setMax(e.target.value)} />
+        <Input type="number" inputMode="decimal" step="any" aria-label="Minimum amount" placeholder="Min amount" value={min} onChange={(e) => setMin(e.target.value)} />
+        <Input type="number" inputMode="decimal" step="any" aria-label="Maximum amount" placeholder="Max amount" value={max} onChange={(e) => setMax(e.target.value)} />
         {active && (
           <Button variant="ghost" onClick={clear} className="col-span-2 md:col-span-1">
             <X className="h-4 w-4" /> Clear filters

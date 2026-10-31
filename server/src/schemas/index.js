@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD");
+const emptyToUndefined = (val) => (val === "" || val === null || val === undefined ? undefined : val);
 
 export const transactionSchema = z.object({
   type: z.enum(["income", "expense"]),
@@ -12,15 +13,15 @@ export const transactionSchema = z.object({
 });
 
 export const transactionQuerySchema = z.object({
-  type: z.enum(["income", "expense"]).optional(),
-  category_id: z.string().uuid().optional(),
-  from: date.optional(),
-  to: date.optional(),
-  min: z.coerce.number().optional(),
-  max: z.coerce.number().optional(),
-  q: z.string().trim().max(100).optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  type: z.preprocess(emptyToUndefined, z.enum(["income", "expense"]).optional()),
+  category_id: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
+  from: z.preprocess(emptyToUndefined, date.optional()),
+  to: z.preprocess(emptyToUndefined, date.optional()),
+  min: z.preprocess(emptyToUndefined, z.coerce.number().optional()),
+  max: z.preprocess(emptyToUndefined, z.coerce.number().optional()),
+  q: z.preprocess(emptyToUndefined, z.string().trim().max(100).optional()),
+  page: z.preprocess(emptyToUndefined, z.coerce.number().int().min(1).default(1)),
+  limit: z.preprocess(emptyToUndefined, z.coerce.number().int().min(1).max(100).default(20)),
 });
 
 export const budgetSchema = z.object({
@@ -29,7 +30,7 @@ export const budgetSchema = z.object({
 });
 
 export const analyticsQuerySchema = z.object({
-  from: date.optional(),
-  to: date.optional(),
-  groupBy: z.enum(["day", "week", "month"]).default("day"),
+  from: z.preprocess(emptyToUndefined, date.optional()),
+  to: z.preprocess(emptyToUndefined, date.optional()),
+  groupBy: z.preprocess(emptyToUndefined, z.enum(["day", "week", "month"]).default("day")),
 });
