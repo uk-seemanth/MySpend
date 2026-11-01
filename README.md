@@ -303,11 +303,3 @@ Before launching publicly, turn **Confirm email** back on in Supabase.
 - Never put the `service_role` or secret key in the client, the server, or the repository.
 - Spreadsheet formula injection is blocked in CSV exports (cells starting with `=`, `+`, `-` or `@` are escaped).
 
----
-
-## Ideas for later
-
-- Custom user categories (the table and policies are already in place)
-- Recurring transactions
-- Receipt uploads with Supabase Storage
-- PWA install support
