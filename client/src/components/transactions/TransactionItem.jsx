@@ -3,7 +3,7 @@ import { getCategoryIcon } from "@/lib/constants";
 import { formatDate, formatMoney } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 
-export default function TransactionItem({ item, onEdit, onDelete }) {
+export default function TransactionItem({ item, onEdit, onDelete, hideDate = false }) {
   const currency = useAuthStore((s) => s.profile?.currency ?? "USD");
   const Icon = getCategoryIcon(item.category?.icon);
   const color = item.category?.color ?? "#8A8A7A";
@@ -28,7 +28,8 @@ export default function TransactionItem({ item, onEdit, onDelete }) {
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold">{item.title}</p>
         <p className="truncate text-xs text-ink/55">
-          {item.category?.name ?? "Uncategorised"} · {formatDate(item.date)}
+          {item.category?.name ?? "Uncategorised"}
+          {!hideDate ? ` · ${formatDate(item.date)}` : ""}
           {item.note ? ` · ${item.note}` : ""}
         </p>
       </div>

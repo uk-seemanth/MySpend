@@ -8,24 +8,43 @@ export default function TrendLine({ data = [], categories = [], height = 260 }) 
   const currency = useAuthStore((s) => s.profile?.currency ?? "USD");
   const [split, setSplit] = useState(false);
 
+  // Safe category list with clean keys
+  const resolvedCategories = useMemo(() => {
+    let list = Array.isArray(categories) && categories.length > 0 ? categories : [];
+    if (!list.length && Array.isArray(data)) {
+      const names = new Set();
+      for (const bucket of data) {
+        if (bucket.expenseByCategory) {
+          Object.keys(bucket.expenseByCategory).forEach((k) => names.add(k));
+        }
+      }
+      list = Array.from(names).map((name) => ({ name }));
+    }
+    return list.map((cat, idx) => ({
+      key: `t_cat_${idx}`,
+      name: cat.name,
+      color: cat.color || "#8A8A7A",
+    }));
+  }, [categories, data]);
+
   // Build per-category cumulative data when split mode is on
   const splitData = useMemo(() => {
-    if (!split || !categories.length) return data;
+    if (!split || !resolvedCategories.length) return data;
     const running = {};
     return data.map((bucket) => {
       const row = { label: bucket.label };
-      for (const cat of categories) {
-        const val = bucket.expenseByCategory?.[cat.name] ?? 0;
+      for (const cat of resolvedCategories) {
+        const val = Number(bucket.expenseByCategory?.[cat.name]) || 0;
         running[cat.name] = (running[cat.name] ?? 0) + val;
-        row[cat.name] = running[cat.name];
+        row[cat.key] = running[cat.name];
       }
       return row;
     });
-  }, [data, categories, split]);
+  }, [data, resolvedCategories, split]);
 
   return (
     <div className="space-y-3">
-      {categories.length > 0 && (
+      {resolvedCategories.length > 0 && (
         <div className="flex">
           <div className="inline-flex gap-0.5 rounded-lg bg-ink/10 p-0.5 text-xs font-semibold">
             {[{ key: false, label: "Total" }, { key: true, label: "By category" }].map((v) => (
@@ -55,8 +74,8 @@ export default function TrendLine({ data = [], categories = [], height = 260 }) 
                   <stop offset="100%" stopColor={EXPENSE_COLOR} stopOpacity={0} />
                 </linearGradient>
               )}
-              {split && categories.map((cat) => (
-                <linearGradient key={cat.name} id={`trendFill-${cat.name}`} x1="0" y1="0" x2="0" y2="1">
+              {split && resolvedCategories.map((cat, idx) => (
+                <linearGradient key={cat.key} id={`trendFill-c${idx}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={cat.color} stopOpacity={0.25} />
                   <stop offset="100%" stopColor={cat.color} stopOpacity={0} />
                 </linearGradient>
@@ -73,15 +92,15 @@ export default function TrendLine({ data = [], categories = [], height = 260 }) 
             {!split ? (
               <Area type="monotone" dataKey="cumulative" stroke={EXPENSE_COLOR} strokeWidth={2.5} fill="url(#trendFill)" />
             ) : (
-              categories.map((cat) => (
+              resolvedCategories.map((cat, idx) => (
                 <Area
-                  key={cat.name}
+                  key={cat.key}
                   type="monotone"
-                  dataKey={cat.name}
+                  dataKey={cat.key}
                   name={cat.name}
                   stroke={cat.color}
                   strokeWidth={2}
-                  fill={`url(#trendFill-${cat.name})`}
+                  fill={`url(#trendFill-c${idx})`}
                   stackId="cat"
                 />
               ))

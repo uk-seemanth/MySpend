@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, ReceiptText } from "lucide-react";
 import { format, isToday, isYesterday, parseISO } from "date-fns";
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { formatMoney } from "@/lib/utils";
 import TransactionItem from "./TransactionItem";
 import TransactionForm from "./TransactionForm";
 import Modal from "@/components/ui/Modal";
@@ -9,15 +11,10 @@ import Skeleton from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 
-function getDateLabel(iso) {
-  const d = parseISO(iso);
-  if (isToday(d)) return "Today";
-  if (isYesterday(d)) return "Yesterday";
-  return format(d, "d MMM yyyy");
-}
-
-// compact=true → dashboard "recent" mode: no pagination, date grouping
-export default function TransactionList({ compact = false }) {
+// compact=true → dashboard "recent" mode: no pagination
+// groupLabels="relative" (default, "Today" / "Yesterday" / dates) or "date" (Transactions page: "EEE, d MMM yyyy")
+export default function TransactionList({ compact = false, groupLabels = "relative" }) {
+  const currency = useAuthStore((s) => s.profile?.currency ?? "USD");
   const { items, total, filters, loading, setFilters, remove } = useTransactionStore();
   const [editing, setEditing] = useState(null);
 
@@ -27,21 +24,42 @@ export default function TransactionList({ compact = false }) {
     if (window.confirm(`Delete "${item.title}"?`)) remove(item.id);
   };
 
-  // Group items by date for compact mode
+  const shouldGroup = compact || groupLabels === "date";
+
+  // Group items by date for compact (Dashboard) or date mode (Transactions page)
   const grouped = useMemo(() => {
-    if (!compact) return null;
+    if (!shouldGroup) return null;
     const groups = [];
     let current = null;
     for (const it of items) {
-      const label = getDateLabel(it.date);
-      if (!current || current.label !== label) {
-        current = { label, items: [] };
+      const dateKey = it.date;
+      if (!current || current.dateKey !== dateKey) {
+        let label = "";
+        if (groupLabels === "date") {
+          try {
+            label = format(parseISO(dateKey), "EEE, d MMM yyyy");
+          } catch {
+            label = dateKey;
+          }
+        } else {
+          try {
+            const d = parseISO(dateKey);
+            label = isToday(d) ? "Today" : isYesterday(d) ? "Yesterday" : format(d, "d MMM yyyy");
+          } catch {
+            label = dateKey;
+          }
+        }
+        current = {
+          dateKey,
+          label,
+          items: [],
+        };
         groups.push(current);
       }
       current.items.push(it);
     }
     return groups;
-  }, [items, compact]);
+  }, [items, shouldGroup, groupLabels]);
 
   if (loading && !items.length)
     return (
@@ -63,20 +81,51 @@ export default function TransactionList({ compact = false }) {
 
   return (
     <>
-      {compact && grouped ? (
-        <div className="space-y-1">
-          {grouped.map((group) => (
-            <div key={group.label}>
-              <p className="px-1 pb-1 pt-3 text-xs font-semibold uppercase tracking-wider text-ink/45">
-                {group.label}
-              </p>
-              <ul className={`divide-y divide-line/60 transition-opacity ${loading ? "opacity-60" : ""}`}>
-                {group.items.map((it) => (
-                  <TransactionItem key={it.id} item={it} onEdit={setEditing} onDelete={handleDelete} />
-                ))}
-              </ul>
-            </div>
-          ))}
+      {shouldGroup && grouped ? (
+        <div className="space-y-3">
+          {grouped.map((group) => {
+            const net = group.items.reduce((sum, it) => {
+              const val = Number(it.amount) || 0;
+              return it.type === "income" ? sum + val : sum - val;
+            }, 0);
+
+            return (
+              <section
+                key={group.dateKey}
+                aria-labelledby={`group-heading-${group.dateKey}`}
+                className="space-y-1"
+              >
+                <div className="flex items-center justify-between px-1 pb-1 pt-3">
+                  <h3
+                    id={`group-heading-${group.dateKey}`}
+                    className="text-xs font-semibold uppercase tracking-wider text-ink/45"
+                  >
+                    {group.label}
+                  </h3>
+                  {groupLabels === "date" && (
+                    <span className="text-xs font-medium tabular-nums text-ink/45">
+                      {net > 0
+                        ? `+${formatMoney(net, currency)}`
+                        : net < 0
+                          ? `−${formatMoney(Math.abs(net), currency)}`
+                          : formatMoney(0, currency)}
+                    </span>
+                  )}
+                </div>
+                <ul className={`divide-y divide-line/60 transition-opacity ${loading ? "opacity-60" : ""}`}>
+                  {group.items.map((it) => (
+                    <TransactionItem
+                      key={it.id}
+                      item={it}
+                      onEdit={setEditing}
+                      onDelete={handleDelete}
+                      hideDate={groupLabels === "date"}
+                    />
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
         </div>
       ) : (
         <ul className={`divide-y divide-line/60 transition-opacity ${loading ? "opacity-60" : ""}`}>

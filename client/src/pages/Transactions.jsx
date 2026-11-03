@@ -25,7 +25,7 @@ export default function Transactions() {
         </Button>
       </div>
       <Card><FilterBar /></Card>
-      <Card><TransactionList /></Card>
+      <Card><TransactionList groupLabels="date" /></Card>
     </div>
   );
 }

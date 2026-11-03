@@ -54,7 +54,7 @@ export default function Analytics() {
         <>
           <Card>
             <h2 className="mb-3 font-bold">Income vs expenses</h2>
-            <SpendBarChart data={data.series} />
+            <SpendBarChart data={data.series} categories={data.categories ?? []} />
           </Card>
           <div className="grid gap-5 lg:grid-cols-2">
             <Card>
@@ -63,7 +63,7 @@ export default function Analytics() {
             </Card>
             <Card>
               <h2 className="mb-3 font-bold">Spending trend</h2>
-              <TrendLine data={data.series} />
+              <TrendLine data={data.series} categories={data.categories ?? []} />
             </Card>
           </div>
         </>
