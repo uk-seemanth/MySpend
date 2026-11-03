@@ -56,7 +56,7 @@ export default function FilterBar() {
         <Input as="select" aria-label="Category" value={filters.category_id} onChange={(e) => setFilters({ category_id: e.target.value })}>
           <option value="">All categories</option>
           {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+            <option key={c.id} value={c.id}>● {c.name}</option>
           ))}
         </Input>
         <Input type="date" aria-label="From date" value={filters.from} onChange={(e) => setFilters({ from: e.target.value })} />

@@ -1,5 +1,5 @@
 import {
-  Utensils, Plane, Receipt, ShoppingBag, HeartPulse, PartyPopper, CircleEllipsis,
+  Utensils, Plane, Receipt, ShoppingBag, HeartPulse, PartyPopper, CircleEllipsis, Dumbbell,
 } from "lucide-react";
 
 const CATEGORY_ICONS = {
@@ -10,8 +10,12 @@ const CATEGORY_ICONS = {
   "heart-pulse": HeartPulse,
   "party-popper": PartyPopper,
   "circle-ellipsis": CircleEllipsis,
+  dumbbell: Dumbbell,
 };
 export const getCategoryIcon = (name) => CATEGORY_ICONS[name] ?? CircleEllipsis;
+
+/** Fallback color when category has none */
+export const getCategoryColor = (category) => category?.color ?? "#8A8A7A";
 
 // Green → red scale. Full class strings so Tailwind can see them.
 export const HEALTH = {

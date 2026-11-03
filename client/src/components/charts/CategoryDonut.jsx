@@ -1,11 +1,30 @@
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { useState, useCallback } from "react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Sector, Tooltip } from "recharts";
 import { useAuthStore } from "@/store/useAuthStore";
-import { formatMoney } from "@/lib/utils";
+import { formatMoney, cn } from "@/lib/utils";
 import { tooltipStyle } from "./shared";
+
+function ActiveShape(props) {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+  return (
+    <Sector
+      cx={cx} cy={cy}
+      innerRadius={innerRadius - 2}
+      outerRadius={outerRadius + 6}
+      startAngle={startAngle}
+      endAngle={endAngle}
+      fill={fill}
+    />
+  );
+}
 
 export default function CategoryDonut({ data = [], height = 220 }) {
   const currency = useAuthStore((s) => s.profile?.currency ?? "USD");
   const total = data.reduce((s, d) => s + d.total, 0);
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  const onLegendEnter = useCallback((i) => setActiveIndex(i), []);
+  const onLegendLeave = useCallback(() => setActiveIndex(-1), []);
 
   return (
     <div className="flex flex-col items-center gap-6 sm:flex-row">
@@ -25,9 +44,16 @@ export default function CategoryDonut({ data = [], height = 220 }) {
               outerRadius="92%"
               paddingAngle={2}
               stroke="none"
+              activeIndex={activeIndex >= 0 ? activeIndex : undefined}
+              activeShape={ActiveShape}
             >
-              {data.map((d) => (
-                <Cell key={d.name} fill={d.color} />
+              {data.map((d, i) => (
+                <Cell
+                  key={d.name}
+                  fill={d.color}
+                  opacity={activeIndex >= 0 && activeIndex !== i ? 0.35 : 1}
+                  style={{ transition: "opacity 0.2s" }}
+                />
               ))}
             </Pie>
             <Tooltip contentStyle={tooltipStyle} formatter={(v) => formatMoney(v, currency)} />
@@ -42,8 +68,16 @@ export default function CategoryDonut({ data = [], height = 220 }) {
       </div>
 
       <ul className="w-full flex-1 space-y-2">
-        {data.map((d) => (
-          <li key={d.name} className="flex items-center gap-2.5 text-sm">
+        {data.map((d, i) => (
+          <li
+            key={d.name}
+            className={cn(
+              "flex cursor-default items-center gap-2.5 rounded-lg px-2 py-1 text-sm transition",
+              activeIndex === i ? "bg-ink/5" : ""
+            )}
+            onMouseEnter={() => onLegendEnter(i)}
+            onMouseLeave={onLegendLeave}
+          >
             <span
               className="h-3 w-3 shrink-0 rounded-full"
               style={{ backgroundColor: d.color }}

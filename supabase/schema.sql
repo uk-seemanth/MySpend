@@ -44,13 +44,14 @@ create index transactions_category_idx  on public.transactions (category_id);
 
 -- ---------- SEED DEFAULT CATEGORIES ----------
 insert into public.categories (user_id, name, icon, color) values
-  (null, 'Food',     'utensils',       '#D98F3E'),
-  (null, 'Travel',   'plane',          '#4A90A4'),
-  (null, 'Bills',    'receipt',        '#8C6BB1'),
-  (null, 'Shopping', 'shopping-bag',   '#C4607A'),
-  (null, 'Health',   'heart-pulse',    '#5FA96B'),
-  (null, 'Fun',      'party-popper',   '#E0B13A'),
-  (null, 'Other',    'circle-ellipsis','#8A8A7A');
+  (null, 'Food',              'utensils',       '#D98F3E'),
+  (null, 'Travel',            'plane',          '#4A90A4'),
+  (null, 'Bills',             'receipt',        '#8C6BB1'),
+  (null, 'Shopping/Groceries','shopping-bag',   '#C4607A'),
+  (null, 'Health',            'heart-pulse',    '#5FA96B'),
+  (null, 'Fun/Snacks',        'party-popper',   '#E0B13A'),
+  (null, 'Fitness',           'dumbbell',       '#2F6FDE'),
+  (null, 'Other',             'circle-ellipsis','#8A8A7A');
 
 -- ---------- AUTO-CREATE PROFILE ON SIGNUP ----------
 create or replace function public.handle_new_user()

@@ -10,7 +10,14 @@ export default function TransactionItem({ item, onEdit, onDelete }) {
   const income = item.type === "income";
 
   return (
-    <li className="flex items-center gap-3 py-3">
+    <li className="flex items-center gap-3 py-3 pl-1">
+      {/* Colored left accent dot */}
+      <span
+        className="h-8 w-1 shrink-0 rounded-full"
+        style={{ backgroundColor: color }}
+        aria-hidden
+      />
+
       <span
         className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
         style={{ backgroundColor: `${color}26`, color }}

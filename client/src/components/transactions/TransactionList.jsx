@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, ReceiptText } from "lucide-react";
+import { format, isToday, isYesterday, parseISO } from "date-fns";
 import { useTransactionStore } from "@/store/useTransactionStore";
 import TransactionItem from "./TransactionItem";
 import TransactionForm from "./TransactionForm";
@@ -8,7 +9,14 @@ import Skeleton from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 
-// compact=true → dashboard "recent" mode: no pagination
+function getDateLabel(iso) {
+  const d = parseISO(iso);
+  if (isToday(d)) return "Today";
+  if (isYesterday(d)) return "Yesterday";
+  return format(d, "d MMM yyyy");
+}
+
+// compact=true → dashboard "recent" mode: no pagination, date grouping
 export default function TransactionList({ compact = false }) {
   const { items, total, filters, loading, setFilters, remove } = useTransactionStore();
   const [editing, setEditing] = useState(null);
@@ -18,6 +26,22 @@ export default function TransactionList({ compact = false }) {
   const handleDelete = (item) => {
     if (window.confirm(`Delete "${item.title}"?`)) remove(item.id);
   };
+
+  // Group items by date for compact mode
+  const grouped = useMemo(() => {
+    if (!compact) return null;
+    const groups = [];
+    let current = null;
+    for (const it of items) {
+      const label = getDateLabel(it.date);
+      if (!current || current.label !== label) {
+        current = { label, items: [] };
+        groups.push(current);
+      }
+      current.items.push(it);
+    }
+    return groups;
+  }, [items, compact]);
 
   if (loading && !items.length)
     return (
@@ -39,11 +63,28 @@ export default function TransactionList({ compact = false }) {
 
   return (
     <>
-      <ul className={`divide-y divide-line/60 transition-opacity ${loading ? "opacity-60" : ""}`}>
-        {items.map((it) => (
-          <TransactionItem key={it.id} item={it} onEdit={setEditing} onDelete={handleDelete} />
-        ))}
-      </ul>
+      {compact && grouped ? (
+        <div className="space-y-1">
+          {grouped.map((group) => (
+            <div key={group.label}>
+              <p className="px-1 pb-1 pt-3 text-xs font-semibold uppercase tracking-wider text-ink/45">
+                {group.label}
+              </p>
+              <ul className={`divide-y divide-line/60 transition-opacity ${loading ? "opacity-60" : ""}`}>
+                {group.items.map((it) => (
+                  <TransactionItem key={it.id} item={it} onEdit={setEditing} onDelete={handleDelete} />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ul className={`divide-y divide-line/60 transition-opacity ${loading ? "opacity-60" : ""}`}>
+          {items.map((it) => (
+            <TransactionItem key={it.id} item={it} onEdit={setEditing} onDelete={handleDelete} />
+          ))}
+        </ul>
+      )}
 
       {!compact && pages > 1 && (
         <div className="mt-4 flex items-center justify-between">
