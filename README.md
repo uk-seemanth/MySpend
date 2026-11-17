@@ -27,6 +27,10 @@ accessible through an intuitive interface.
 
 ## Application Preview
 
+### Login
+
+![MySpend Login](./screenshots/login.png)
+
 ### Dashboard
 
 ![MySpend Dashboard](./screenshots/dashboard.png)
@@ -39,9 +43,7 @@ accessible through an intuitive interface.
 
 ![MySpend Analytics](./screenshots/analytics.png)
 
-### Login
 
-![MySpend Login](./screenshots/login.png)
 
 > Make sure the images are saved in the `screenshots` folder using the
 > filenames shown above. GitHub will display them when the paths match.
