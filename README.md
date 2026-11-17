@@ -20,10 +20,21 @@ accessible through an intuitive interface.
 
   Layer      Technologies
   ---------- -------------------------------
-  Frontend   \[Add frontend technologies\]
-  Backend    \[Add backend technologies\]
-  Database   \[Add database technologies\]
-  Tools      Git, GitHub
+  Frontend: React.js, Vite, Tailwind CSS
+
+Backend: Node.js, Express.js
+
+Database & Authentication: Supabase
+
+State Management: Zustand
+
+Validation: Zod
+
+Charts: Recharts
+
+Deployment: Vercel
+
+Tools      Git, GitHub
 
 ## Application Preview
 
